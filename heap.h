@@ -1,7 +1,9 @@
 #ifndef HEAP_H
 #define HEAP_H
 #include <functional>
+#include <vector>
 #include <stdexcept>
+#include <iostream>
 
 template <typename T, typename PComparator = std::less<T> >
 class Heap
@@ -36,6 +38,7 @@ public:
    * @return T const& top priority item
    * @throw std::underflow_error if the heap is empty
    */
+
   T const & top() const;
 
   /**
@@ -59,16 +62,75 @@ public:
    */
   size_t size() const;
 
+
 private:
   /// Add whatever helper functions and data members you need below
 
+  std::vector<T> heapheap;
+  unsigned int _m;
+  PComparator _c;
 
-
-
+  void heapifyup(int location);
+  void heapifydown(int location);
 };
 
-// Add implementation of member functions here
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::heapifyup(int location){
+    if(location == 0){
+        return;
+    }
 
+    int p = (location + _m - 1)/ _m - 1;
+
+    while(_c(heapheap[location],heapheap[p])&& p >= 0){
+        std::swap(heapheap[location],heapheap[p]);
+        location = p;
+        p = (location + _m - 1)/_m - 1;
+        if(p >=(int)heapheap.size() || p<0){
+            break;
+        }
+    }
+}
+
+template <typename T, typename PComparator>
+ void Heap<T,PComparator>::heapifydown(int location){
+    int c = (location + 1) * _m - _m + 1;
+
+    if(c > (int)(Heap<T,PComparator>::size() - 1)){
+        return;
+    }
+
+    int smallc = c;
+    
+    for(unsigned int i = 0; i < _m; i++){
+        if((c + i)< (int) Heap<T, PComparator>::size() && _c(heapheap[c + i],heapheap[smallc])){
+            smallc = c + i;
+        }
+    }
+    if(_c(heapheap[smallc],heapheap[location])){
+        std::swap(heapheap[smallc], heapheap[location]);
+        heapifydown(smallc);
+    }
+}
+
+
+// Add implementation of member functions here
+template <typename T, typename PComparator>
+Heap<T,PComparator>::Heap(int m, PComparator c){
+    _m = m;
+    _c =c;
+}
+
+template <typename T, typename PComparator>
+Heap<T,PComparator>::~Heap(){
+
+}
+
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::push(const T& item){
+    heapheap.push_back(item);
+    heapifyup(Heap<T,PComparator>::size()-1);
+}
 
 // We will start top() for you to handle the case of 
 // calling top on an empty heap
@@ -81,16 +143,14 @@ T const & Heap<T,PComparator>::top() const
     // ================================
     // throw the appropriate exception
     // ================================
-
-
+    throw std::underflow_error("Tried to get top of set that was empty");
   }
   // If we get here we know the heap has at least 1 item
   // Add code to return the top element
-
+  return heapheap[0];
 
 
 }
-
 
 // We will start pop() for you to handle the case of 
 // calling top on an empty heap
@@ -101,15 +161,26 @@ void Heap<T,PComparator>::pop()
     // ================================
     // throw the appropriate exception
     // ================================
-
+    throw std::underflow_error("Tried to get top of set that was empty");
 
   }
+  std::swap(heapheap[0],heapheap[Heap<T,PComparator>::size()-1]);
+  heapheap.pop_back();
+  heapifydown(0);
+}
+template <typename T, typename PComparator>
+bool Heap<T,PComparator>::empty() const{
+    if(heapheap.size() == 0){
+        return 1;
+    }else{
+        return 0;
+    }
+}
 
-
-
+template <typename T, typename PComparator>
+size_t Heap<T,PComparator>::size() const{
+    return heapheap.size();
 }
 
 
-
 #endif
-

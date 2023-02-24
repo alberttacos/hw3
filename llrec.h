@@ -82,9 +82,22 @@ Node* llfilter(Node* head, Comp pred)
 {
     //*********************************************
     // Provide your implementation below
-    //*********************************************
+    //********************************************
+  if(head == NULL){
+    return NULL;
 
-
+    }else if(head != NULL){
+      
+      if(!pred(head->val)){
+        head->next = llfilter(head->next,pred);
+        return head;
+      }
+      else{
+        Node* tempo = llfilter(head->next,pred);
+        delete head;
+        return tempo;
+      }
+    }
 }
 
 #endif
